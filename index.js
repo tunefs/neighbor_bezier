@@ -51,7 +51,7 @@ const neighbor_bezier = (bz, p, t0, t1) => {
   const splitbz = split_bezier(bz);
   const center = splitbz[0][3];
   const tangential = differential(0.5, bz);
-  const perpendicular = sub(p, center)
+  const perpendicular = sub(p, center);
   return dot(tangential, perpendicular) < 0
     ? neighbor_bezier(splitbz[0], p, t0, tcenter)
     : neighbor_bezier(splitbz[1], p, tcenter, t1);
