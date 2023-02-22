@@ -116,8 +116,10 @@ const redraw = (ctx, p) => {
   ctx.fill();
 
   ctx.fillStyle = 'black';
-  ctx.font = '20px';
-  ctx.fillText(`${Math.floor(pp[0])} / ${Math.floor(pp[1])}`, 500, 20);
+  ctx.font = '14px Aria';
+  ctx.fillText(`mouse: ${p[0]} / ${p[1]}`, 400, 20);
+  ctx.fillText(`t: ${t}`, 400, 40);
+  ctx.fillText(`pos: ${Math.floor(pp[0])} / ${Math.floor(pp[1])}`, 400, 60);
 };
 
 const canvas = document.getElementById('canvas');
