@@ -43,18 +43,42 @@ const split_bezier = bz => {
   ];
 };
 
-const neighbor_bezier = (bz, p, t0, t1) => {
-  const tcenter = (t0 + t1) * 0.5;
+const diff2_to_line = (line, p) => {
+  const ps = sub(line[0], p);
+  const [a, b] = sub(line[1], line[0]);
+  const n2 = norm_squared([a, b]);
+  const tt = -(a * ps[0] + b * ps[1]);
+  if (tt < 0)
+    return norm_squared(ps);
+  else if (tt > n2)
+    return norm_squared(sub(line[1], p));
+  const f1 = a * ps[1] - b * ps[0];
+  return f1 * f1 / n2;
+};
+const diff2_to_polygon = (bz, p) => {
+  return Math.min(
+    diff2_to_line([bz[0], bz[1]], p),
+    diff2_to_line([bz[1], bz[2]], p),
+    diff2_to_line([bz[2], bz[3]], p),
+    diff2_to_line([bz[3], bz[0]], p)
+  );
+};
+
+const done_or_recursive = (bz, p, t0, t1) => {
   const n2 = norm_squared(sub(bz[3], bz[0]));
   if (n2 < 1 * 1)
-    return tcenter;
+    return (t0 + t1) * 0.5;
+  return neighbor_bezier(bz, p, t0, t1);
+};
+
+const neighbor_bezier = (bz, p, t0, t1) => {
   const splitbz = split_bezier(bz);
-  const center = splitbz[0][3];
-  const tangential = differential(0.5, bz);
-  const perpendicular = sub(p, center);
-  return dot(tangential, perpendicular) < 0
-    ? neighbor_bezier(splitbz[0], p, t0, tcenter)
-    : neighbor_bezier(splitbz[1], p, tcenter, t1);
+  const d0 = diff2_to_polygon(splitbz[0], p);
+  const d1 = diff2_to_polygon(splitbz[1], p);
+  const tcenter = (t0 + t1) * 0.5;
+  return d0 < d1
+    ? done_or_recursive(splitbz[0], p, t0, tcenter)
+    : done_or_recursive(splitbz[1], p, tcenter, t1);
 };
 
 const bezier = [
